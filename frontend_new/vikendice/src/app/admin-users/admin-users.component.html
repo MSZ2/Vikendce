@@ -1,0 +1,24 @@
+<h2 class="text-xl font-bold mb-4">Korisnici</h2>
+
+<table class="table-auto w-full border">
+  <thead>
+    <tr class="bg-gray-100">
+      <th>Korisničko ime</th>
+      <th>Email</th>
+      <th>Status</th>
+      <th>Akcija</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let u of users" class="border-b">
+      <td>{{ u.username }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.status }}</td>
+      <td>
+        <button (click)="changeStatus(u._id, 'approved')" class="bg-green-500 text-white px-2 py-1 rounded">✅ Odobri</button>
+        <button (click)="changeStatus(u._id, 'rejected')" class="bg-red-500 text-white px-2 py-1 rounded ml-2">❌ Odbij</button>
+        <button (click)="changeStatus(u._id, 'pending')" class="bg-yellow-500 text-white px-2 py-1 rounded ml-2">⏳ Vrati</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

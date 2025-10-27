@@ -1,0 +1,13 @@
+<h2>Пријава администратора</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div>
+    <label>Корисничко име</label>
+    <input formControlName="username" />
+  </div>
+  <div>
+    <label>Лозинка</label>
+    <input type="password" formControlName="password" />
+  </div>
+  <div *ngIf="error" style="color:red">{{ error }}</div>
+  <button type="submit" [disabled]="loading">Пријави се</button>
+</form>

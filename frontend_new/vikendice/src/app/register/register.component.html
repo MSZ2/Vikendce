@@ -1,0 +1,26 @@
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+  <input formControlName="username" placeholder="Корисничко име" required>
+  <input type="password" formControlName="password" placeholder="Лозинка" required>
+  <input formControlName="firstName" placeholder="Име" required>
+  <input formControlName="lastName" placeholder="Презиме" required>
+
+  <select formControlName="gender">
+    <option value="M">М</option>
+    <option value="F">Ж</option>
+  </select>
+
+  <input formControlName="address" placeholder="Адреса">
+  <input formControlName="phone" placeholder="Телефон">
+  <input formControlName="email" type="email" placeholder="И-мејл" required>
+
+  <input type="file" (change)="onFileSelected($event)">
+  <input formControlName="cardNumber" placeholder="Број картице" (input)="onCardChange()">
+  <img *ngIf="cardType" [src]="'assets/icons/' + cardType + '.png'" width="50">
+
+  <select formControlName="role">
+    <option value="owner">Власник</option>
+    <option value="tourist">Туриста</option>
+  </select>
+
+  <button type="submit">Региструј се</button>
+</form>
