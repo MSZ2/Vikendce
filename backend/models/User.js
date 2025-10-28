@@ -23,7 +23,7 @@ UserSchema.methods.setPassword = async function(password) {
 };
 
 UserSchema.methods.verifyPassword = async function(password) {
-  return bcrypt.compare(password, this.passwordHash);
+  return bcrypt.compare(password, this.password);
 };
 
 module.exports =mongoose.model('User', UserSchema, "users");

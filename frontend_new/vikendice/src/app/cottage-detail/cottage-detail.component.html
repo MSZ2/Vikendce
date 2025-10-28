@@ -1,0 +1,21 @@
+<h1>{{ cottage?.name }}</h1>
+<p>{{ cottage?.location }}</p>
+<p>Цена ноћења: {{ cottage?.pricePerNight }} RSD</p>
+<p>Телефон: {{ cottage?.phone }}</p>
+
+<h3>Услуге</h3>
+<ul>
+  <li *ngFor="let s of cottage?.services">{{ s }}</li>
+</ul>
+
+<h3>Галерија слика</h3>
+<div *ngFor="let img of cottage?.images">
+  <img [src]="'http://localhost:4000' + (img.startsWith('/') ? img : '/' + img)" alt="Cottage image" width="200">
+</div>
+
+<h3>Просечна оцена: {{ avgRating || 'нема оцена' }}</h3>
+
+<h3>Коментари</h3>
+<div *ngFor="let r of reviews">
+  <p><strong>{{ r.tourist.username }}:</strong> {{ r.comment }} ({{ r.rating }}/5)</p>
+</div>

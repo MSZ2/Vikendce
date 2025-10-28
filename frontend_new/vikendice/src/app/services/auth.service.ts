@@ -43,9 +43,6 @@ export class AuthService {
   getUser() {
     return JSON.parse(localStorage.getItem('user') || 'null');
   }
-  getAdmin() {
-    return JSON.parse(localStorage.getItem('admin') || 'null');
-  }
 
   isLoggedIn() {
     return !!this.getToken();

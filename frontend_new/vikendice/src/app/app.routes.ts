@@ -7,10 +7,16 @@ import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { RegisterComponent } from './register/register.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminGuard } from './guards/admin.guard';
+import { HomeComponent } from './home/home.component';
+import { CottageDetailComponent } from './cottage-detail/cottage-detail.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 //import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  
+  { path: '', component: HomeComponent },
+  { path: 'cottages/:id', component: CottageDetailComponent, canActivate: [AuthGuard] },
+  { path: 'profile', component: UserProfileComponent, canActivate: [AuthGuard] },
 
   // Public route
   { path: 'login', component: LoginComponent },

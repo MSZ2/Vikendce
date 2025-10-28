@@ -1,0 +1,36 @@
+<h2>Мој профил</h2>
+
+<form [formGroup]="profileForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+  <div>
+    <label>Име:</label>
+    <input type="text" formControlName="firstName">
+  </div>
+  <div>
+    <label>Презиме:</label>
+    <input type="text" formControlName="lastName">
+  </div>
+  <div>
+    <label>Адреса:</label>
+    <input type="text" formControlName="address">
+  </div>
+  <div>
+    <label>Емаил:</label>
+    <input type="email" formControlName="email">
+  </div>
+  <div>
+    <label>Телефон:</label>
+    <input type="text" formControlName="phone">
+  </div>
+  <div *ngIf="showCardNumber">
+    <label>Број картице:</label>
+    <input type="text" formControlName="cardNumber">
+  </div>
+  <div>
+    <label>Профилна слика:</label>
+    <input type="file" (change)="onFileSelected($event)">
+    <div *ngIf="user.profileImage">
+      <img [src]="user.profileImage" alt="Profile Image" width="150">
+    </div>
+  </div>
+  <button type="submit">Ажурирај профил</button>
+</form>

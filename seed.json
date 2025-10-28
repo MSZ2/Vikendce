@@ -1,0 +1,89 @@
+{
+  "users": [
+    {
+      "_id": { "$oid": "64ff00000000000000000001" },
+      "username": "owner1",
+      "password": "$2b$10$7d3k8R7a3jR2n9fVh6cYWeuXbqB2mHkgTxLxL6z1aH5ZtP8Wz0GqS", 
+      "firstName": "Milan",
+      "lastName": "Petrovic",
+      "gender": "M",
+      "email": "owner1@example.com",
+      "role": "owner",
+      "status": "approved",
+      "createdAt": { "$date": "2025-10-28T18:00:00Z" },
+      "updatedAt": { "$date": "2025-10-28T18:00:00Z" }
+    },
+    {
+      "_id": { "$oid": "64ff00000000000000000002" },
+      "username": "tourist1",
+      "password": "$2b$10$2gH8N6rP3qK7d9jFh5vQXeGvYwzB4mJbTqWxM8zR7qK0V6Fz5bHcT", 
+      "firstName": "Ana",
+      "lastName": "Jovanovic",
+      "gender": "F",
+      "email": "tourist1@example.com",
+      "role": "tourist",
+      "status": "approved",
+      "createdAt": { "$date": "2025-10-28T18:05:00Z" },
+      "updatedAt": { "$date": "2025-10-28T18:05:00Z" }
+    }
+  ],
+  "cottages": [
+    {
+      "_id": { "$oid": "64ff10000000000000000001" },
+      "name": "Planinska Oaza",
+      "location": "Kopaonik",
+      "coordinates": { "lat": 43.3175, "lng": 20.8500 },
+      "owner": { "$oid": "64ff00000000000000000001" },
+      "images": [
+        "/uploads/cottage1_1.jpg",
+        "/uploads/cottage1_2.jpg"
+      ],
+      "services": ["WiFi", "Parking", "Roštilj", "Kamin"],
+      "priceSummer": 10000,
+      "priceWinter": 12000,
+      "phone": "+381641234567",
+      "createdAt": { "$date": "2025-10-28T18:10:00Z" }
+    },
+    {
+      "_id": { "$oid": "64ff10000000000000000002" },
+      "name": "Vikendica Mir",
+      "location": "Zlatibor",
+      "coordinates": { "lat": 43.7139, "lng": 19.6995 },
+      "owner": { "$oid": "64ff00000000000000000001" },
+      "images": [
+        "/uploads/cottage2_1.jpg",
+        "/uploads/cottage2_2.jpg"
+      ],
+      "services": ["WiFi", "Bazen", "Parking", "Terasa"],
+      "priceSummer": 9000,
+      "priceWinter": 11000,
+      "phone": "+381641234568",
+      "createdAt": { "$date": "2025-10-28T18:15:00Z" }
+    }
+  ],
+  "bookings": [
+    {
+      "_id": { "$oid": "64ff20000000000000000001" },
+      "cottage": { "$oid": "64ff10000000000000000001" },
+      "tourist": { "$oid": "64ff00000000000000000002" },
+      "startDate": { "$date": "2025-11-10T00:00:00Z" },
+      "endDate": { "$date": "2025-11-15T00:00:00Z" },
+      "createdAt": { "$date": "2025-10-28T18:20:00Z" },
+      "status": "approved",
+      "rating": 5,
+      "comment": "Prelepa vikendica, sve super!"
+    },
+    {
+      "_id": { "$oid": "64ff20000000000000000002" },
+      "cottage": { "$oid": "64ff10000000000000000002" },
+      "tourist": { "$oid": "64ff00000000000000000002" },
+      "startDate": { "$date": "2025-12-01T00:00:00Z" },
+      "endDate": { "$date": "2025-12-05T00:00:00Z" },
+      "createdAt": { "$date": "2025-10-28T18:25:00Z" },
+      "status": "approved",
+      "rating": 4,
+      "comment": "Udobno i mirno, preporučujem!"
+    }
+  ]
+}
+

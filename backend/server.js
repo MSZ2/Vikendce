@@ -2,9 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
-
-authRoutes = require('./routes/auth');
-adminRoutes = require('./routes/admin');
+const homeRoutes = require('./routes/home');
+const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
+const cottageRoutes = require('./routes/cottage');
+const path = require('path');
+const usersRouter = require('./routes/user');
 Admin = require('./models/Admin');
 const bcrypt = require('bcrypt');
 
@@ -46,7 +49,11 @@ app.use(cors()); // configure origin in production
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/admin', adminRoutes); 
+app.use('/api/home', homeRoutes);
+app.use('/api/cottage', cottageRoutes);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // statičke slike
+app.use('/api/users', usersRouter);
 
 connectDB(process.env.MONGO_URI).then(() => {
     createInitialAdmins();

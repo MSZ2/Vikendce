@@ -1,0 +1,34 @@
+<h2>Статистика</h2>
+<ul>
+  <li>Укупно викендица: {{ stats.totalCottages }}</li>
+  <li>Укупно власника: {{ stats.totalOwners }}</li>
+  <li>Укупно туриста: {{ stats.totalTourists }}</li>
+  <li>Резервисано последњих 24h: {{ stats.reserved24h }}</li>
+  <li>Резервисано последњих 7 дана: {{ stats.reserved7d }}</li>
+  <li>Резервисано последњих 30 дана: {{ stats.reserved30d }}</li>
+</ul>
+
+<h2>Претрага викендица</h2>
+<input placeholder="Назив" [(ngModel)]="searchName">
+<input placeholder="Место" [(ngModel)]="searchLocation">
+<button (click)="search()">Претражи</button>
+
+<h2>Листа викендица</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th (click)="sort('name')">Назив</th>
+      <th (click)="sort('location')">Место</th>
+      <th>Цена</th>
+      <th>Детаљи</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let c of cottages">
+      <td>{{ c.name }}</td>
+      <td>{{ c.location }}</td>
+      <td>{{ c.pricePerNight }} RSD</td>
+      <td><a [routerLink]="['/cottages', c._id]">Више</a></td>
+    </tr>
+  </tbody>
+</table>
