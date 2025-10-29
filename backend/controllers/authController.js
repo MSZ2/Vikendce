@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Admin = require('../models/Admin');
+const RejectedCredential = require('../models/RejectedCredential');
 const path = require('path');
 
 // ---------- POMOĆNE FUNKCIJE ----------
@@ -79,6 +80,13 @@ exports.register = async (req, res) => {
 
     if (cardNumber && !validateCard(cardNumber))
       return res.status(400).json({ message: 'Неисправан број картице' });
+
+    const rejected = await RejectedCredential.findOne({
+      $or: [{ username: username.toLowerCase() }, { email: email.toLowerCase() }]
+    });
+    if(rejected) {
+      return res.status(409).json({ message: 'Ово корисничко име или имејл су одбијени и не могу се користити.' });
+    }
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser)

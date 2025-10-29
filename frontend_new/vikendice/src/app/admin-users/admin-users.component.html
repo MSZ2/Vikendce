@@ -1,24 +1,335 @@
-<h2 class="text-xl font-bold mb-4">Korisnici</h2>
+<section class="admin-users-wrapper">
+  <header class="page-header">
+    <h1>Администрација корисника</h1>
+    <p class="hint">Прегледајте, додајте или уредите власнике и туристе, као и захтеве за регистрацију.</p>
+  </header>
 
-<table class="table-auto w-full border">
-  <thead>
-    <tr class="bg-gray-100">
-      <th>Korisničko ime</th>
-      <th>Email</th>
-      <th>Status</th>
-      <th>Akcija</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let u of users" class="border-b">
-      <td>{{ u.username }}</td>
-      <td>{{ u.email }}</td>
-      <td>{{ u.status }}</td>
-      <td>
-        <button (click)="changeStatus(u._id, 'approved')" class="bg-green-500 text-white px-2 py-1 rounded">✅ Odobri</button>
-        <button (click)="changeStatus(u._id, 'rejected')" class="bg-red-500 text-white px-2 py-1 rounded ml-2">❌ Odbij</button>
-        <button (click)="changeStatus(u._id, 'pending')" class="bg-yellow-500 text-white px-2 py-1 rounded ml-2">⏳ Vrati</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <p *ngIf="loading" class="info">Учитавање...</p>
+  <p *ngIf="error" class="feedback error">{{ error }}</p>
+  <p *ngIf="success" class="feedback success">{{ success }}</p>
+
+  <section class="card">
+    <h2>Додај новог корисника</h2>
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="form-grid">
+      <label>
+        Корисничко име *
+        <input type="text" formControlName="username">
+      </label>
+      <label>
+        Лозинка *
+        <input type="password" formControlName="password">
+      </label>
+      <label>
+        Име *
+        <input type="text" formControlName="firstName">
+      </label>
+      <label>
+        Презиме *
+        <input type="text" formControlName="lastName">
+      </label>
+      <label>
+        Пол *
+        <select formControlName="gender">
+          <option value="M">Мушко</option>
+          <option value="F">Женско</option>
+        </select>
+      </label>
+      <label>
+        Имејл *
+        <input type="email" formControlName="email">
+      </label>
+      <label>
+        Телефон
+        <input type="text" formControlName="phone">
+      </label>
+      <label>
+        Адреса
+        <input type="text" formControlName="address">
+      </label>
+      <label>
+        Улога *
+        <select formControlName="role">
+          <option value="owner">Власник</option>
+          <option value="tourist">Туриста</option>
+        </select>
+      </label>
+      <label>
+        Почетни статус *
+        <select formControlName="status">
+          <option value="approved">Одобрен</option>
+          <option value="pending">На чекању</option>
+          <option value="rejected">Одбијен</option>
+        </select>
+      </label>
+      <div class="form-actions full-width">
+        <button type="submit" class="primary" [disabled]="createForm.invalid || loading">Додај корисника</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card" *ngIf="pending.length">
+    <h2>Захтеви за регистрацију</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Корисник</th>
+          <th>Имејл</th>
+          <th>Улога</th>
+          <th>Акције</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of pending">
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td class="actions">
+            <button class="btn-primary" (click)="changeStatus(user._id, 'approved')">Одобри</button>
+            <button class="btn-danger" (click)="changeStatus(user._id, 'rejected')">Одбиј</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Власници</h2>
+    <table *ngIf="owners.length; else noOwners">
+      <thead>
+        <tr>
+          <th>Корисничко име</th>
+          <th>Имејл</th>
+          <th>Статус</th>
+          <th>Акције</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let user of owners">
+          <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.status }}</td>
+            <td class="actions">
+            <div class="status-buttons">
+              <button
+                class="btn-primary"
+                [disabled]="user.status === 'approved' || loading"
+                (click)="changeStatus(user._id, 'approved')">
+                Одобри
+              </button>
+              <button
+                class="btn-warning"
+                [disabled]="user.status === 'pending' || loading"
+                (click)="changeStatus(user._id, 'pending')">
+                На чекању
+              </button>
+              <button
+                class="btn-danger"
+                [disabled]="user.status === 'rejected' || loading"
+                (click)="changeStatus(user._id, 'rejected')">
+                Одбиј
+              </button>
+            </div>
+            <button class="btn-primary" (click)="startEdit(user)">Уреди</button>
+              <button class="btn-danger" (click)="removeUser(user)">Обриши</button>
+            </td>
+          </tr>
+          <tr *ngIf="editingUserId === user._id">
+            <td colspan="5">
+              <form [formGroup]="editForm" (ngSubmit)="saveEdit(user)" class="inline-form">
+                <div class="form-grid">
+                  <label>
+                    Име
+                    <input type="text" formControlName="firstName">
+                  </label>
+                  <label>
+                    Презиме
+                    <input type="text" formControlName="lastName">
+                  </label>
+                  <label>
+                    Пол
+                    <select formControlName="gender">
+                      <option value="M">Мушко</option>
+                      <option value="F">Женско</option>
+                    </select>
+                  </label>
+                  <label>
+                    Имејл
+                    <input type="email" formControlName="email">
+                  </label>
+                  <label>
+                    Телефон
+                    <input type="text" formControlName="phone">
+                  </label>
+                  <label>
+                    Адреса
+                    <input type="text" formControlName="address">
+                  </label>
+                  <label>
+                    Улога
+                    <select formControlName="role">
+                      <option value="owner">Власник</option>
+                      <option value="tourist">Туриста</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="secondary" (click)="cancelEdit()">Откажи</button>
+                  <button type="submit" class="primary" [disabled]="editForm.invalid || loading">Сачувај</button>
+                </div>
+              </form>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <ng-template #noOwners>
+      <p class="empty-state">Тренутно нема власника.</p>
+    </ng-template>
+  </section>
+
+  <section class="card">
+    <h2>Туристи</h2>
+    <table *ngIf="tourists.length; else noTourists">
+      <thead>
+        <tr>
+          <th>Корисничко име</th>
+          <th>Имејл</th>
+          <th>Статус</th>
+          <th>Акције</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let user of tourists">
+          <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.status }}</td>
+            <td class="actions">
+            <div class="status-buttons">
+              <button
+                class="btn-primary"
+                [disabled]="user.status === 'approved' || loading"
+                (click)="changeStatus(user._id, 'approved')">
+                Одобри
+              </button>
+              <button
+                class="btn-warning"
+                [disabled]="user.status === 'pending' || loading"
+                (click)="changeStatus(user._id, 'pending')">
+                На чекању
+              </button>
+              <button
+                class="btn-danger"
+                [disabled]="user.status === 'rejected' || loading"
+                (click)="changeStatus(user._id, 'rejected')">
+                Одбиј
+              </button>
+            </div>
+            <button class="btn-primary" (click)="startEdit(user)">Уреди</button>
+              <button class="btn-danger" (click)="removeUser(user)">Обриши</button>
+            </td>
+          </tr>
+          <tr *ngIf="editingUserId === user._id">
+            <td colspan="5">
+              <form [formGroup]="editForm" (ngSubmit)="saveEdit(user)" class="inline-form">
+                <div class="form-grid">
+                  <label>
+                    Име
+                    <input type="text" formControlName="firstName">
+                  </label>
+                  <label>
+                    Презиме
+                    <input type="text" formControlName="lastName">
+                  </label>
+                  <label>
+                    Пол
+                    <select formControlName="gender">
+                      <option value="M">Мушко</option>
+                      <option value="F">Женско</option>
+                    </select>
+                  </label>
+                  <label>
+                    Имејл
+                    <input type="email" formControlName="email">
+                  </label>
+                  <label>
+                    Телефон
+                    <input type="text" formControlName="phone">
+                  </label>
+                  <label>
+                    Адреса
+                    <input type="text" formControlName="address">
+                  </label>
+                  <label>
+                    Улога
+                    <select formControlName="role">
+                      <option value="owner">Власник</option>
+                      <option value="tourist">Туриста</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="secondary" (click)="cancelEdit()">Откажи</button>
+                  <button type="submit" class="primary" [disabled]="editForm.invalid || loading">Сачувај</button>
+                </div>
+              </form>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <ng-template #noTourists>
+      <p class="empty-state">Тренутно нема туриста.</p>
+    </ng-template>
+  </section>
+
+  <section class="card">
+    <h2>Викендице</h2>
+    <table *ngIf="cottages.length; else noCottages">
+      <thead>
+        <tr>
+          <th>Назив</th>
+          <th>Место</th>
+          <th>Власник</th>
+          <th>Недавне оцене</th>
+          <th>Блокирана до</th>
+          <th>Акција</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cottage of cottages" [class.low-rated]="cottage.lowRated">
+          <td>{{ cottage.name }}</td>
+          <td>{{ cottage.location }}</td>
+          <td>
+            <div>{{ cottage.owner?.username || '—' }}</div>
+            <div class="text-muted" *ngIf="cottage.owner?.email">{{ cottage.owner?.email }}</div>
+          </td>
+          <td>
+            <span *ngIf="cottage.recentRatings?.length; else noRatings">
+              {{ cottage.recentRatings?.join(', ') }}
+            </span>
+            <ng-template #noRatings>—</ng-template>
+          </td>
+          <td>
+            <span *ngIf="cottage.blockedUntil; else notBlocked">
+              {{ cottage.blockedUntil | date:'dd.MM.yyyy. HH:mm' }}
+            </span>
+            <ng-template #notBlocked>—</ng-template>
+          </td>
+          <td class="actions">
+            <button
+              class="btn-danger"
+              *ngIf="cottage.lowRated"
+              (click)="blockCottage(cottage)">
+              Блокирај 48h
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #noCottages>
+      <p class="empty-state">Нема података о викендицама.</p>
+    </ng-template>
+  </section>
+</section>

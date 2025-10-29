@@ -15,4 +15,28 @@ export class CottageService {
   scheduleBooking(id: string, payload: any): Observable<any> {
     return this.http.post(`${this.api}/${id}/bookings`, payload);
   }
+
+  getOwnerCottages(): Observable<any> {
+    return this.http.get(`${this.api}/owner/me`);
+  }
+
+  updateCottage(id: string, payload: any): Observable<any> {
+    return this.http.put(`${this.api}/${id}`, payload);
+  }
+
+  deleteCottage(id: string): Observable<any> {
+    return this.http.delete(`${this.api}/${id}`);
+  }
+
+  createCottage(payload: FormData): Observable<any> {
+    return this.http.post(this.api, payload);
+  }
+
+  getAllCottagesForAdmin(): Observable<any> {
+    return this.http.get(`${this.api}/admin`);
+  }
+
+  blockCottage(id: string): Observable<any> {
+    return this.http.patch(`${this.api}/${id}/block`, {});
+  }
 }

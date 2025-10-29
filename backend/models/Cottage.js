@@ -13,7 +13,8 @@ const CottageSchema = new mongoose.Schema({
   phone: { type: String },
   createdAt: { type: Date, default: Date.now },
   maxGuests: { type: Number },
-  unavailableDates: [Date]
+  unavailableDates: [Date],
+  blockedUntil: { type: Date }
 });
 
 module.exports = mongoose.model('Cottage', CottageSchema, "cottages");

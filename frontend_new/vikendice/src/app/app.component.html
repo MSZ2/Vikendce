@@ -1,6 +1,7 @@
 <nav class="main-nav">
   <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Викендице</a>
   <a *ngIf="isTourist || isOwner" routerLink="/reservations" routerLinkActive="active">Резервације</a>
+  <a *ngIf="isOwner" routerLink="/my-cottages" routerLinkActive="active">Моје викендице</a>
   <a *ngIf="isAuthenticated" routerLink="/profile" routerLinkActive="active">Профил</a>
 
   <span class="spacer"></span>

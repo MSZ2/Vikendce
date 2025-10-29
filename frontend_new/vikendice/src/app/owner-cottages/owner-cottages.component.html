@@ -1,0 +1,169 @@
+<section class="owner-cottages-wrapper">
+  <header class="page-header">
+    <h1>Моје викендице</h1>
+    <p class="hint">Управљајте подацима о својим викендицама. Измените информације или обришите викендицу.</p>
+  </header>
+
+  <p *ngIf="loading" class="info">Обрада у току...</p>
+  <p *ngIf="error" class="feedback error">{{ error }}</p>
+  <p *ngIf="success" class="feedback success">{{ success }}</p>
+
+  <section class="create-card">
+    <h2>Додај нову викендицу</h2>
+    <p class="hint">Попуните поља или учитајте JSON фајл да аутоматски попуните детаље (осим слика).</p>
+
+    <form class="create-form" [formGroup]="createForm" (ngSubmit)="createCottage()">
+      <div class="form-grid">
+        <label>
+          Назив *
+          <input type="text" formControlName="name">
+        </label>
+        <label>
+          Локација *
+          <input type="text" formControlName="location">
+        </label>
+        <label>
+          Latitude
+          <input type="number" step="any" formControlName="lat">
+        </label>
+        <label>
+          Longitude
+          <input type="number" step="any" formControlName="lng">
+        </label>
+        <label>
+          Цена (стандард)
+          <input type="number" min="0" formControlName="pricePerNight">
+        </label>
+        <label>
+          Цена (лето) *
+          <input type="number" min="0" formControlName="priceSummer">
+        </label>
+        <label>
+          Цена (зима) *
+          <input type="number" min="0" formControlName="priceWinter">
+        </label>
+        <label>
+          Телефон
+          <input type="text" formControlName="phone">
+        </label>
+        <label>
+          Максималан број гостију
+          <input type="number" min="0" formControlName="maxGuests">
+        </label>
+        <label class="full-width">
+          Услуге (слободан текст)
+          <textarea rows="2" formControlName="services"></textarea>
+        </label>
+        <label class="full-width">
+          Фотографије
+          <input type="file" (change)="onImagesSelected($event)" multiple accept="image/*">
+        </label>
+        <label class="full-width">
+          Учитај JSON (опционо)
+          <input type="file" accept="application/json" (change)="onJsonSelected($event)">
+        </label>
+      </div>
+
+      <p *ngIf="jsonError" class="feedback error">{{ jsonError }}</p>
+
+      <div class="form-actions">
+        <button type="submit" class="primary" [disabled]="createForm.invalid || loading">Додај викендицу</button>
+      </div>
+    </form>
+  </section>
+
+  <section *ngIf="cottages.length; else noCottages" class="cottages-grid">
+    <article class="cottage-card" *ngFor="let cottage of cottages">
+      <div class="cottage-header">
+        <h2>{{ cottage.name }}</h2>
+        <span class="location">{{ cottage.location }}</span>
+      </div>
+
+      <div class="cottage-meta">
+        <p *ngIf="cottage.coordinates?.lat !== undefined && cottage.coordinates?.lng !== undefined">
+          <strong>Координате:</strong> {{ cottage.coordinates?.lat }} , {{ cottage.coordinates?.lng }}
+        </p>
+        <p *ngIf="cottage.maxGuests">
+          <strong>Максималан број гостију:</strong> {{ cottage.maxGuests }}
+        </p>
+        <p *ngIf="cottage.phone">
+          <strong>Телефон:</strong> {{ cottage.phone }}
+        </p>
+        <p>
+          <strong>Цене:</strong>
+          <span *ngIf="cottage.pricePerNight">стандард {{ cottage.pricePerNight | number:'1.0-0' }} RSD · </span>
+          лето {{ cottage.priceSummer | number:'1.0-0' }} RSD · зима {{ cottage.priceWinter | number:'1.0-0' }} RSD
+        </p>
+        <p *ngIf="cottage.services?.length">
+          <strong>Услуге:</strong> {{ cottage.services?.join(', ') }}
+        </p>
+        <p *ngIf="cottage.images?.length">
+          <strong>Слике:</strong> {{ cottage.images?.length  || 0}} датотека(а)
+        </p>
+      </div>
+
+      <div class="actions-row" *ngIf="editingId !== cottage._id">
+        <button type="button" class="btn-primary" (click)="startEdit(cottage)">Уреди</button>
+        <button type="button" class="btn-danger" (click)="deleteCottage(cottage)">Обриши</button>
+      </div>
+
+      <form class="edit-form" *ngIf="editingId === cottage._id" [formGroup]="editForm" (ngSubmit)="saveChanges()">
+        <div class="form-grid">
+          <label>
+            Назив
+            <input type="text" formControlName="name">
+          </label>
+          <label>
+            Локација
+            <input type="text" formControlName="location">
+          </label>
+          <label>
+            Latitude
+            <input type="number" step="any" formControlName="lat">
+          </label>
+          <label>
+            Longitude
+            <input type="number" step="any" formControlName="lng">
+          </label>
+          <label>
+            Цена (стандард)
+            <input type="number" min="0" formControlName="pricePerNight">
+          </label>
+          <label>
+            Цена (лето) *
+            <input type="number" min="0" formControlName="priceSummer" required>
+          </label>
+          <label>
+            Цена (зима) *
+            <input type="number" min="0" formControlName="priceWinter" required>
+          </label>
+          <label>
+            Телефон
+            <input type="text" formControlName="phone">
+          </label>
+          <label>
+            Максималан број гостију
+            <input type="number" min="0" formControlName="maxGuests">
+          </label>
+          <label class="full-width">
+            Линкови слика (раздвојени зарезом или новим редом)
+            <textarea rows="2" formControlName="images"></textarea>
+          </label>
+          <label class="full-width">
+            Услуге (раздвојене зарезом или новим редом)
+            <textarea rows="2" formControlName="services"></textarea>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="secondary" (click)="cancelEdit()">Откажи</button>
+          <button type="submit" class="primary" [disabled]="editForm.invalid || loading">Сачувај</button>
+        </div>
+      </form>
+    </article>
+  </section>
+
+  <ng-template #noCottages>
+    <p class="empty-state">Тренутно немате регистрованих викендица.</p>
+  </ng-template>
+</section>

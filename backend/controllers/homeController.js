@@ -113,10 +113,14 @@ exports.scheduleBooking = async (req, res) => {
       return res.status(403).json({ message: 'Само туристи могу да поднесу захтев за резервацију.' });
     }
 
-    const cottage = await Cottage.findById(cottageId);
-    if(!cottage) {
-      return res.status(404).json({ message: 'Викендица није пронађена.' });
-    }
+  const cottage = await Cottage.findById(cottageId);
+  if(!cottage) {
+    return res.status(404).json({ message: 'Викендица није пронађена.' });
+  }
+
+  if(cottage.blockedUntil && cottage.blockedUntil > new Date()) {
+    return res.status(400).json({ message: 'Викендица је тренутно блокирана за резервацију. Покушајте касније.' });
+  }
 
     if(!startDate || !endDate) {
       return res.status(400).json({ message: 'Оба датума су обавезна.' });

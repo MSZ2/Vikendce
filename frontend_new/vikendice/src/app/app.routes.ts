@@ -11,6 +11,8 @@ import { HomeComponent } from './home/home.component';
 import { CottageDetailComponent } from './cottage-detail/cottage-detail.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { ReservationsComponent } from './reservations/reservations.component';
+import { OwnerCottagesComponent } from './owner-cottages/owner-cottages.component';
+import { OwnerGuard } from './guards/owner.guard';
 //import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
@@ -19,6 +21,7 @@ export const routes: Routes = [
   { path: 'cottages/:id', component: CottageDetailComponent, canActivate: [AuthGuard] },
   { path: 'profile', component: UserProfileComponent, canActivate: [AuthGuard] },
   { path: 'reservations', component: ReservationsComponent, canActivate: [AuthGuard] },
+  { path: 'my-cottages', component: OwnerCottagesComponent, canActivate: [OwnerGuard] },
 
   // Public route
   { path: 'login', component: LoginComponent },
