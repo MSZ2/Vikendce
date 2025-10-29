@@ -9,7 +9,7 @@ const path = require('path');
 //const passwordRegex = /^(?=[a-zA-Z])(?=.[0-9])(?=.[!@#$%^&])(?=.[A-Z])(?=.[a-z].[a-z].*[a-z]).{6,10}$/
 //const passwordRegex = /^[A-Za-z](?=.*\d)(?=(?:.*[a-z]){3,})(?=.*[A-Z])(?=.*[!@#$%^&*]).{5,9}$/
 //REGEX TO DO
-const passwordRegex = /^.*/;
+const passwordRegex = /^[A-Za-z](?=(?:.*[a-z]){3,})(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z]\S{5,9}$/;
 const validateCard = (number) => {
   if (/^(300|301|302|303|36|38)\d{12}$/.test(number)) return 'diners';
   if (/^(51|52|53|54|55)\d{14}$/.test(number)) return 'mastercard';

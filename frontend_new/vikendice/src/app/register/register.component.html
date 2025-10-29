@@ -15,7 +15,7 @@
 
   <input type="file" (change)="onFileSelected($event)">
   <input formControlName="cardNumber" placeholder="Број картице" (input)="onCardChange()">
-  <img *ngIf="cardType" [src]="'assets/icons/' + cardType + '.png'" width="50">
+  <img *ngIf="cardType" [src]="cardType + '.png'" width="50">
 
   <select formControlName="role">
     <option value="owner">Власник</option>
