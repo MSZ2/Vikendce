@@ -20,14 +20,30 @@
       <th (click)="sort('name')">Назив</th>
       <th (click)="sort('location')">Место</th>
       <th>Цена</th>
+      <th *ngIf="showTouristFeatures">Просечна оцена</th>
       <th>Детаљи</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let c of cottages">
-      <td>{{ c.name }}</td>
+      <td>
+        <a [routerLink]="['/cottages', c._id]" class="cottage-link">{{ c.name }}</a>
+      </td>
       <td>{{ c.location }}</td>
       <td>{{ c.pricePerNight }} RSD</td>
+      <td *ngIf="showTouristFeatures">
+        <ng-container *ngIf="c.avgRating !== null && c.avgRating !== undefined; else noRating">
+          <span class="rating-value">{{ c.avgRating | number:'1.1-2' }}</span>
+          <span class="stars">
+            <span
+              *ngFor="let star of stars"
+              class="star"
+              [ngClass]="getStarClass(star, c.avgRating)">
+            </span>
+          </span>
+        </ng-container>
+        <ng-template #noRating>—</ng-template>
+      </td>
       <td><a [routerLink]="['/cottages', c._id]">Више</a></td>
     </tr>
   </tbody>

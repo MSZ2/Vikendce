@@ -10,5 +10,9 @@ export class CottageService {
   constructor(private http: HttpClient) { }
   getCottageDetails(id: string): Observable<any> {
     return this.http.get(`${this.api}/${id}`);
-}
+  }
+
+  scheduleBooking(id: string, payload: any): Observable<any> {
+    return this.http.post(`${this.api}/${id}/bookings`, payload);
+  }
 }

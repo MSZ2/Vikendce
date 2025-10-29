@@ -8,6 +8,7 @@ const adminRoutes = require('./routes/admin');
 const cottageRoutes = require('./routes/cottage');
 const path = require('path');
 const usersRouter = require('./routes/user');
+const bookingsRouter = require('./routes/booking');
 Admin = require('./models/Admin');
 const bcrypt = require('bcrypt');
 
@@ -54,6 +55,7 @@ app.use('/api/home', homeRoutes);
 app.use('/api/cottage', cottageRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // statičke slike
 app.use('/api/users', usersRouter);
+app.use('/api/bookings', bookingsRouter);
 
 connectDB(process.env.MONGO_URI).then(() => {
     createInitialAdmins();

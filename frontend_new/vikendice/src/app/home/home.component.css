@@ -1,0 +1,46 @@
+.cottage-link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.rating-value {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 0.2rem;
+  vertical-align: middle;
+}
+
+.star {
+  position: relative;
+  display: inline-block;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.star::before {
+  content: '\2605';
+  font-size: 1.1rem;
+  color: #c8c8c8;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.star.filled::before {
+  color: #f5c518;
+}
+
+.star.half::after {
+  content: '\2605';
+  font-size: 1.1rem;
+  color: #f5c518;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+}

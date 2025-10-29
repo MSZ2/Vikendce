@@ -1,21 +1,162 @@
-<h1>{{ cottage?.name }}</h1>
-<p>{{ cottage?.location }}</p>
-<p>Цена ноћења: {{ cottage?.pricePerNight }} RSD</p>
-<p>Телефон: {{ cottage?.phone }}</p>
+<section class="cottage-header">
+  <h1>{{ cottage?.name }}</h1>
+  <p class="location">{{ cottage?.location }}</p>
 
-<h3>Услуге</h3>
-<ul>
-  <li *ngFor="let s of cottage?.services">{{ s }}</li>
-</ul>
+  <div class="rating" *ngIf="avgRating !== null; else noAverage">
+    <span class="rating-value">{{ avgRating | number:'1.1-2' }}</span>
+    <span class="stars">
+      <span
+        *ngFor="let star of stars"
+        class="star"
+        [ngClass]="getStarClass(star, avgRating)">
+      </span>
+    </span>
+  </div>
+  <ng-template #noAverage>
+    <p class="no-rating">Нема доступних оцена</p>
+  </ng-template>
+</section>
 
-<h3>Галерија слика</h3>
-<div *ngFor="let img of cottage?.images">
-  <img [src]="'http://localhost:4000' + (img.startsWith('/') ? img : '/' + img)" alt="Cottage image" width="200">
-</div>
+<section class="contact" *ngIf="cottage">
+  <h3>Контакт</h3>
+  <p *ngIf="cottage.phone">Телефон: {{ cottage.phone }}</p>
+  <p *ngIf="cottage.owner?.username">Власник: {{ cottage.owner.username }}</p>
+</section>
 
-<h3>Просечна оцена: {{ avgRating || 'нема оцена' }}</h3>
+<section class="pricing" *ngIf="cottage">
+  <h3>Ценовник ноћења</h3>
+  <ul>
+    <li *ngIf="cottage.pricePerNight">Стандардна цена: {{ cottage.pricePerNight }} RSD</li>
+    <li *ngIf="cottage.priceSummer">Летња сезона: {{ cottage.priceSummer }} RSD</li>
+    <li *ngIf="cottage.priceWinter">Зимска сезона: {{ cottage.priceWinter }} RSD</li>
+    <li *ngIf="!cottage.pricePerNight && !cottage.priceSummer && !cottage.priceWinter">Информација није доступна.</li>
+  </ul>
+</section>
 
-<h3>Коментари</h3>
-<div *ngFor="let r of reviews">
-  <p><strong>{{ r.tourist.username }}:</strong> {{ r.comment }} ({{ r.rating }}/5)</p>
-</div>
+<section class="services" *ngIf="cottage?.services?.length">
+  <h3>Услуге</h3>
+  <ul>
+    <li *ngFor="let s of cottage.services">{{ s }}</li>
+  </ul>
+</section>
+
+<section class="gallery" *ngIf="cottage?.images?.length">
+  <h3>Галерија слика</h3>
+  <div class="gallery-grid">
+    <img
+      *ngFor="let img of cottage.images"
+      [src]="'http://localhost:4000' + (img.startsWith('/') ? img : '/' + img)"
+      alt="Cottage image">
+  </div>
+</section>
+
+<section class="map-section">
+  <h3>Локација</h3>
+  <div *ngIf="mapUrl; else noMap" class="map-container">
+    <iframe [src]="mapUrl" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+  <ng-template #noMap>
+    <p>Локација није доступна.</p>
+  </ng-template>
+</section>
+
+<section class="reviews">
+  <h3>Коментари</h3>
+  <div *ngIf="reviews?.length; else noReviews">
+    <article class="review-card" *ngFor="let r of reviews">
+      <header>
+        <strong>{{ r.tourist.username }}</strong>
+        <span class="stars">
+          <span
+            *ngFor="let star of stars"
+            class="star"
+            [ngClass]="getStarClass(star, r.rating)">
+          </span>
+        </span>
+        <span class="rating-value">{{ r.rating }}/5</span>
+      </header>
+      <p>{{ r.comment }}</p>
+      <small>{{ r.createdAt | date:'shortDate' }}</small>
+    </article>
+  </div>
+  <ng-template #noReviews>
+    <p>Још увек нема коментара.</p>
+  </ng-template>
+</section>
+
+<section *ngIf="canMakeReservation" class="booking-widget">
+  <h3>Закажите изнајмљивање</h3>
+  <p class="booking-subtitle">Попуните кораке {{ currentStep }} / 2 како бисте послали захтев власнику.</p>
+
+  <div class="step-indicator">
+    <span [class.active]="currentStep === 1">1. Термин</span>
+    <span [class.active]="currentStep === 2">2. Потврда и плаћање</span>
+  </div>
+
+  <form [formGroup]="bookingForm" novalidate>
+    <ng-container [ngSwitch]="currentStep">
+      <div *ngSwitchCase="1" class="booking-step">
+        <div class="form-row">
+          <label for="startDate">Почетак одседања</label>
+          <input id="startDate" type="datetime-local" formControlName="startDate">
+        </div>
+        <div class="form-row">
+          <label for="endDate">Крај одседања</label>
+          <input id="endDate" type="datetime-local" formControlName="endDate">
+        </div>
+        <div class="form-row">
+          <label for="adults">Одрасли</label>
+          <input id="adults" type="number" min="1" formControlName="adults">
+        </div>
+        <div class="form-row">
+          <label for="children">Деца</label>
+          <input id="children" type="number" min="0" formControlName="children">
+        </div>
+
+        <p class="capacity-hint" *ngIf="cottage?.maxGuests">Максимални капацитет: {{ cottage.maxGuests }} гостију.</p>
+
+        <div class="form-actions">
+          <button type="button" class="primary" (click)="goToStep(2)">Настави</button>
+        </div>
+      </div>
+
+      <div *ngSwitchCase="2" class="booking-step">
+        <div class="summary">
+          <h4>Резиме</h4>
+          <ul>
+            <li><strong>Викендица:</strong> {{ cottage?.name }}</li>
+            <li><strong>Почетак:</strong> {{ bookingForm.value.startDate | date:'short' }}</li>
+            <li><strong>Крај:</strong> {{ bookingForm.value.endDate | date:'short' }}</li>
+            <li><strong>Ноћења:</strong> {{ nightsCount }}</li>
+            <li><strong>Гости:</strong> {{ bookingForm.value.adults }} одраслих, {{ bookingForm.value.children }} деце</li>
+          </ul>
+        </div>
+
+        <div class="form-row">
+          <label for="cardNumber">Картица</label>
+          <input id="cardNumber" type="text" inputmode="numeric" formControlName="cardNumber" placeholder="Унесите број картице">
+          <small>Промените број ако желите да користите другу картицу.</small>
+        </div>
+
+        <div class="form-row">
+          <label for="note">Напомена (опционо)</label>
+          <textarea id="note" rows="3" maxlength="500" formControlName="note" placeholder="Посебни захтеви, до 500 карактера"></textarea>
+        </div>
+
+        <div class="price-info">
+          <p>Укупан износ: <strong>{{ calculatedPrice | number:'1.2-2' }} RSD</strong></p>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="secondary" (click)="goToStep(1)">Назад</button>
+          <button type="button" class="primary" [disabled]="isSubmitting" (click)="submitBooking()">
+            {{ isSubmitting ? 'Сачекајте...' : 'Потврди резервацију' }}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </form>
+
+  <p *ngIf="bookingError" class="feedback error">{{ bookingError }}</p>
+  <p *ngIf="bookingSuccess" class="feedback success">{{ bookingSuccess }}</p>
+</section>

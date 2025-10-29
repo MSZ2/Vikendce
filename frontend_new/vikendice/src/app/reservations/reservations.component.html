@@ -1,0 +1,284 @@
+<section class="reservations-wrapper">
+  <h1>Резервације</h1>
+
+  <p *ngIf="loading" class="info">Учитавање резервација...</p>
+  <p *ngIf="error" class="feedback error">{{ error }}</p>
+  <p *ngIf="success" class="feedback success">{{ success }}</p>
+
+  <ng-container [ngSwitch]="role">
+    <!-- Tourist view -->
+    <ng-container *ngSwitchCase="'tourist'">
+      <section class="table-section">
+        <header>
+          <h2>Актуелне резервације</h2>
+          <p class="hint">Резервације које почињу за више од 24 часа можете отказати.</p>
+        </header>
+
+        <table *ngIf="hasCurrentBookings(); else noCurrent" class="reservations-table">
+          <thead>
+            <tr>
+              <th>Почетак</th>
+              <th>Крај</th>
+              <th>Назив викендице</th>
+              <th>Место</th>
+              <th>Статус</th>
+              <th>Акције</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let booking of currentBookings">
+              <td>{{ booking.startDate | date:'dd.MM.yyyy. HH:mm' }}</td>
+              <td>{{ booking.endDate | date:'dd.MM.yyyy. HH:mm' }}</td>
+              <td>{{ booking.cottage?.name || '—' }}</td>
+              <td>{{ booking.cottage?.location || '—' }}</td>
+              <td>{{ booking.status | titlecase }}</td>
+              <td class="actions">
+                <button
+                  type="button"
+                  class="link danger"
+                  [disabled]="!booking.canCancel || loading"
+                  (click)="cancelBooking(booking)">
+                  Откажи резервацију
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #noCurrent>
+          <p class="empty-state">Тренутно немате активних резервација.</p>
+        </ng-template>
+      </section>
+
+      <section class="table-section">
+        <header>
+          <h2>Претходне резервације</h2>
+          <p class="hint">Оставите утисак за одмор који сте завршили.</p>
+        </header>
+
+        <table *ngIf="hasHistoryBookings(); else noHistory" class="reservations-table">
+          <thead>
+            <tr>
+              <th>Почетак</th>
+              <th>Назив викендице</th>
+              <th>Коментар</th>
+              <th>Оцена</th>
+              <th>Статус</th>
+              <th>Акције</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let booking of historyBookings">
+              <td>{{ booking.startDate | date:'dd.MM.yyyy.' }}</td>
+              <td>{{ booking.cottage?.name || '—' }}</td>
+              <td>
+                <span *ngIf="booking.comment; else noComment">
+                  {{ booking.comment }}
+                </span>
+                <ng-template #noComment>
+                  <span class="text-muted">—</span>
+                </ng-template>
+                <div
+                  class="owner-comment"
+                  *ngIf="booking.ownerComment && booking.status === 'rejected'">
+                  <strong>Разлог:</strong> {{ booking.ownerComment }}
+                </div>
+              </td>
+              <td>
+                <ng-container *ngIf="booking.rating; else noRating">
+                  <span class="stars readonly">
+                    <span
+                      *ngFor="let star of stars"
+                      class="star"
+                      [class.filled]="star <= (booking.rating || 0)">
+                    </span>
+                  </span>
+                  <span class="rating-value">{{ booking.rating }}/5</span>
+                </ng-container>
+                <ng-template #noRating>
+                  <span class="text-muted">—</span>
+                </ng-template>
+              </td>
+              <td>{{ booking.status | titlecase }}</td>
+              <td class="actions">
+                <button
+                  *ngIf="booking.canReview"
+                  type="button"
+                  class="link"
+                  (click)="openReview(booking)">
+                  {{ openReviewId === booking._id ? 'Затвори форму' : 'Остави утисак' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #noHistory>
+          <p class="empty-state">Још увек немате претходних резервација.</p>
+        </ng-template>
+      </section>
+
+      <section *ngIf="openReviewId" class="review-form">
+        <h3>Оставите утисак</h3>
+        <p *ngIf="reviewState[openReviewId]?.error" class="feedback error">
+          {{ reviewState[openReviewId].error }}
+        </p>
+
+        <div class="stars">
+          <button
+            type="button"
+            *ngFor="let star of stars"
+            class="star-button"
+            [class.filled]="star <= (reviewState[openReviewId].rating || 0)"
+            (click)="setRating(openReviewId, star)">
+            ★
+          </button>
+        </div>
+
+        <textarea
+          rows="4"
+          maxlength="500"
+          [(ngModel)]="reviewState[openReviewId].comment"
+          placeholder="Поделите своје искуство (опционо, до 500 карактера)">
+        </textarea>
+
+        <div class="review-actions">
+          <button type="button" class="secondary" (click)="openReviewId = null">Откажи</button>
+          <button
+            type="button"
+            class="primary"
+            [disabled]="reviewState[openReviewId].submitting"
+            (click)="submitReview(openReviewId)">
+            {{ reviewState[openReviewId].submitting ? 'Слање...' : 'Пошаљи' }}
+          </button>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Owner view -->
+    <ng-container *ngSwitchCase="'owner'">
+      <section class="table-section">
+        <header>
+          <h2>Необрађене резервације</h2>
+          <p class="hint">Преглед свих захтева туриста сортираних по датуму пријаве.</p>
+        </header>
+
+        <table *ngIf="pendingRequests.length; else noOwnerPending" class="reservations-table">
+          <thead>
+            <tr>
+              <th>Пријављено</th>
+              <th>Период</th>
+              <th>Викендица</th>
+              <th>Туриста</th>
+              <th>Напомена</th>
+              <th>Коментар &amp; акције</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let booking of pendingRequests">
+              <td>{{ booking.createdAt | date:'dd.MM.yyyy. HH:mm' }}</td>
+              <td>
+                {{ booking.startDate | date:'dd.MM.yyyy. HH:mm' }}<br>
+                до {{ booking.endDate | date:'dd.MM.yyyy. HH:mm' }}
+              </td>
+              <td>
+                <strong>{{ booking.cottage?.name }}</strong>
+                <div class="text-muted">{{ booking.cottage?.location }}</div>
+              </td>
+              <td>
+                <strong>{{ booking.tourist?.username }}</strong>
+                <div class="text-muted">{{ booking.tourist?.firstName }} {{ booking.tourist?.lastName }}</div>
+                <div class="text-muted" *ngIf="booking.tourist?.email">{{ booking.tourist?.email }}</div>
+                <div class="text-muted" *ngIf="booking.tourist?.phone">{{ booking.tourist?.phone }}</div>
+              </td>
+              <td>
+                <div *ngIf="booking.note; else noNote">{{ booking.note }}</div>
+                <ng-template #noNote><span class="text-muted">Без напомене</span></ng-template>
+                <div class="text-muted" *ngIf="booking.totalPrice">Износ: {{ booking.totalPrice | number:'1.2-2' }} RSD</div>
+              </td>
+              <td>
+                <ng-container *ngIf="getDecisionState(booking._id) as state">
+                  <textarea
+                    rows="3"
+                    maxlength="500"
+                    [(ngModel)]="state.comment"
+                    placeholder="Коментар (обавезан за одбијање)"></textarea>
+                  <div class="action-buttons">
+                    <button
+                      type="button"
+                      class="btn-primary"
+                      [disabled]="state.submitting || loading"
+                      (click)="approveBooking(booking._id)">
+                      Потврди
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-danger"
+                      [disabled]="state.submitting || loading"
+                      (click)="rejectBooking(booking._id)">
+                      Одбиј
+                    </button>
+                  </div>
+                  <p *ngIf="state.error" class="feedback error">{{ state.error }}</p>
+                </ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #noOwnerPending>
+          <p class="empty-state">Нема резервација које чекају обраду.</p>
+        </ng-template>
+      </section>
+
+      <section class="calendar-section">
+        <header>
+          <h2>Календар резервација</h2>
+          <p class="hint">Зелено: потврђене резервације, жута: резервације на чекању.</p>
+        </header>
+        <div class="calendar-card">
+          <full-calendar [options]="calendarOptions"></full-calendar>
+        </div>
+      </section>
+
+      <div class="event-dialog" *ngIf="selectedEvent">
+        <div class="dialog-content">
+          <header>
+            <h3>{{ selectedEvent.cottage?.name }} — {{ selectedEvent.tourist?.username }}</h3>
+            <button type="button" class="close-btn" (click)="closeEventDialog()">×</button>
+          </header>
+          <div class="dialog-body">
+            <p><strong>Период:</strong> {{ selectedEvent.start | date:'dd.MM.yyyy. HH:mm' }} - {{ selectedEvent.end | date:'dd.MM.yyyy. HH:mm' }}</p>
+            <p><strong>Статус:</strong> {{ selectedEvent.status | titlecase }}</p>
+            <p *ngIf="selectedEvent?.note"><strong>Напомена:</strong> {{ selectedEvent.note }}</p>
+            <p *ngIf="selectedEvent?.totalPrice"><strong>Износ:</strong> {{ selectedEvent.totalPrice | number:'1.2-2' }} RSD</p>
+
+            <ng-container *ngIf="selectedEvent?.tourist as t">
+              <p class="text-muted">{{ t.firstName }} {{ t.lastName }} | {{ t.email }} | {{ t.phone }}</p>
+            </ng-container>
+
+            <ng-container *ngIf="selectedEvent?.status === 'pending'; else acceptedInfo">
+              <ng-container *ngIf="getDecisionState(selectedEvent?.id!) as state">
+                <textarea
+                  rows="3"
+                  maxlength="500"
+                  [(ngModel)]="state.comment"
+                  placeholder="Коментар (обавезан за одбијање)"></textarea>
+                <p *ngIf="state.error" class="feedback error">{{ state.error }}</p>
+                <div class="dialog-actions">
+                  <button type="button" class="secondary" (click)="closeEventDialog()">Затвори</button>
+                  <button type="button" class="btn-danger" [disabled]="state.submitting || loading" (click)="rejectSelectedEvent()">Одбиј</button>
+                  <button type="button" class="btn-primary" [disabled]="state.submitting || loading" (click)="approveSelectedEvent()">Потврди</button>
+                </div>
+              </ng-container>
+            </ng-container>
+
+            <ng-template #acceptedInfo>
+              <p class="info">Ова резервација је већ прихваћена.</p>
+              <div class="dialog-actions">
+                <button type="button" class="primary" (click)="closeEventDialog()">Затвори</button>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</section>

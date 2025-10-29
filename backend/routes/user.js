@@ -18,6 +18,7 @@ router.get('/me', authenticateJWT, async (req, res) => {
     }
 
     const responseUser = {
+      id: user._id,
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -52,6 +53,7 @@ router.put('/me', authenticateJWT, upload.single('profileImage'), async (req, re
 
     // vrati samo polja koja su relevantna za frontend
     const responseUser = {
+      id: updatedUser._id,
       username: updatedUser.username,
       firstName: updatedUser.firstName,
       lastName: updatedUser.lastName,

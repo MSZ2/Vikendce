@@ -1,1 +1,20 @@
-<router-outlet />
+<nav class="main-nav">
+  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Викендице</a>
+  <a *ngIf="isTourist || isOwner" routerLink="/reservations" routerLinkActive="active">Резервације</a>
+  <a *ngIf="isAuthenticated" routerLink="/profile" routerLinkActive="active">Профил</a>
+
+  <span class="spacer"></span>
+
+  <ng-container *ngIf="isAuthenticated; else guestLinks">
+    <button type="button" class="logout-btn" (click)="logout()">Одјава</button>
+  </ng-container>
+
+  <ng-template #guestLinks>
+    <a routerLink="/login" routerLinkActive="active" class="auth-link">Улогуј се</a>
+    <a routerLink="/register" routerLinkActive="active" class="auth-link primary">Региструј се</a>
+  </ng-template>
+</nav>
+
+<main class="app-content">
+  <router-outlet />
+</main>

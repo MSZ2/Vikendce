@@ -1,0 +1,271 @@
+.reservations-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.reservations-wrapper h1 {
+  margin: 0;
+}
+
+.table-section header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.hint {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.reservations-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.reservations-table thead {
+  background-color: #f5c518;
+  color: #1f1f1f;
+}
+
+.reservations-table th,
+.reservations-table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+}
+
+.reservations-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.empty-state {
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 0.75rem;
+  color: #555;
+}
+
+.info {
+  color: #555;
+}
+
+.feedback {
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  font-weight: 600;
+}
+
+.feedback.error {
+  background-color: #fde8e7;
+  color: #c0392b;
+}
+
+.feedback.success {
+  background-color: #e9f7ef;
+  color: #1a7f37;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+button.link {
+  background: none;
+  border: none;
+  color: #1f4ed8;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 600;
+}
+
+button.link.danger {
+  color: #c0392b;
+}
+
+button.link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.stars.readonly .star {
+  font-size: 1.05rem;
+  color: #c8c8c8;
+}
+
+.stars.readonly .star.filled {
+  color: #f5c518;
+}
+
+.rating-value {
+  margin-left: 0.35rem;
+  font-weight: 600;
+}
+
+.owner-comment {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background-color: rgba(209, 67, 67, 0.08);
+  color: #7f1d1d;
+  font-size: 0.95rem;
+}
+
+.review-form {
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e0e0e0;
+  background-color: #fffefa;
+  display: grid;
+  gap: 1rem;
+}
+
+.review-form textarea {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #d2d2d2;
+  padding: 0.75rem;
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+.star-button {
+  border: none;
+  background: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #c8c8c8;
+  transition: color 0.2s ease;
+}
+
+.star-button.filled,
+.star-button:hover,
+.star-button:focus {
+  color: #f5c518;
+  outline: none;
+}
+
+.review-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.primary,
+.secondary {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary {
+  background-color: #f5c518;
+  color: #1f1f1f;
+}
+
+.primary[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background-color: #e3e3e3;
+  color: #333;
+}
+
+.calendar-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.calendar-card {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  padding: 1rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.event-dialog {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+}
+
+.dialog-content {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 45px rgba(15, 23, 42, 0.25);
+  max-width: 520px;
+  width: 100%;
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.dialog-content header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dialog-content h3 {
+  margin: 0;
+}
+
+.close-btn {
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+  color: #6b7280;
+}
+
+.dialog-body {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.dialog-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.dialog-actions .btn-primary,
+.dialog-actions .btn-danger,
+.dialog-actions .primary,
+.dialog-actions .secondary {
+  min-width: 120px;
+}

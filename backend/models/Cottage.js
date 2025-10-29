@@ -7,10 +7,13 @@ const CottageSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   images: [String],
   services: [String],
+  pricePerNight: { type: Number },
   priceSummer: { type: Number, required: true },
   priceWinter: { type: Number, required: true },
   phone: { type: String },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  maxGuests: { type: Number },
+  unavailableDates: [Date]
 });
 
 module.exports = mongoose.model('Cottage', CottageSchema, "cottages");
