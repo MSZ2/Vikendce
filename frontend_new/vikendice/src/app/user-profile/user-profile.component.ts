@@ -27,18 +27,18 @@ export class UserProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.user = this.auth.getUser();
+    const cachedUser = this.auth.getUser();
+    if(cachedUser) {
+      this.applyUserData(cachedUser);
+    } else {
+      this.initializeForm();
+    }
 
-    // prikaži polje za kreditnu karticu samo za turiste
-    this.showCardNumber = this.user.role === 'tourist';
-
-    this.profileForm = this.fb.group({
-      firstName: [this.user.firstName],
-      lastName: [this.user.lastName],
-      address: [this.user.address],
-      email: [this.user.email],
-      phone: [this.user.phone],
-      cardNumber: [this.user.cardNumber] // neće se prikazivati za vlasnika
+    this.auth.fetchCurrentUser().subscribe({
+      next: (res) => this.applyUserData(res),
+      error: (err) => {
+        console.error('Greška pri učitavanju profila', err);
+      }
     });
   }
 
@@ -67,4 +67,32 @@ export class UserProfileComponent implements OnInit {
     ).subscribe();
   }
 
+  private initializeForm() {
+    this.profileForm = this.fb.group({
+      firstName: [''],
+      lastName: [''],
+      address: [''],
+      email: [''],
+      phone: [''],
+      cardNumber: ['']
+    });
+  }
+
+  private applyUserData(userData: any) {
+    this.user = userData;
+    this.showCardNumber = this.user?.role === 'tourist';
+
+    if(!this.profileForm) {
+      this.initializeForm();
+    }
+
+    this.profileForm.patchValue({
+      firstName: this.user?.firstName || '',
+      lastName: this.user?.lastName || '',
+      address: this.user?.address || '',
+      email: this.user?.email || '',
+      phone: this.user?.phone || '',
+      cardNumber: this.user?.cardNumber || ''
+    });
+  }
 }

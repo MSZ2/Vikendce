@@ -7,6 +7,35 @@ const path = require('path');
 
 const upload = multer({ dest: 'uploads/' });
 
+// GET /api/users/me - vrati podatke o ulogovanom korisniku
+router.get('/me', authenticateJWT, async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findById(userId);
+    if(!user) {
+      return res.status(404).json({ message: 'Korisnik nije pronađen' });
+    }
+
+    const responseUser = {
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      address: user.address,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      cardNumber: user.cardNumber,
+      profileImage: user.profileImage
+    };
+
+    res.json(responseUser);
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ message: 'Greška pri dohvaćanju profila' });
+  }
+});
+
 // PUT /api/users/me - update profile (turista ili vlasnik)
 router.put('/me', authenticateJWT, upload.single('profileImage'), async (req, res) => {
   const userId = req.user.id; // uzimamo id iz JWT-a

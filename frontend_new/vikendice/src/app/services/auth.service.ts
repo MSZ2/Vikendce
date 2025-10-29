@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private api = 'http://localhost:4000/api/auth';
+  private usersApi = 'http://localhost:4000/api/users';
 
   constructor(private http: HttpClient) {}
 
@@ -42,6 +43,16 @@ export class AuthService {
 
   getUser() {
     return JSON.parse(localStorage.getItem('user') || 'null');
+  }
+
+  fetchCurrentUser(): Observable<any> {
+    return this.http.get(`${this.usersApi}/me`).pipe(
+      tap((res: any) => {
+        if(res) {
+          localStorage.setItem('user', JSON.stringify(res));
+        }
+      })
+    );
   }
 
   isLoggedIn() {

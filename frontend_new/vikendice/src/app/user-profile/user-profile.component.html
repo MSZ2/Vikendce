@@ -28,8 +28,8 @@
   <div>
     <label>Профилна слика:</label>
     <input type="file" (change)="onFileSelected($event)">
-    <div *ngIf="user.profileImage">
-      <img [src]="user.profileImage" alt="Profile Image" width="150">
+    <div *ngIf="user?.profileImage">
+      <img [src]="'http://localhost:4000' + (user?.profileImage.startsWith('/') ? user?.profileImage : '/' + user?.profileImage)" alt="Profile Image" width="150">
     </div>
   </div>
   <button type="submit">Ажурирај профил</button>
