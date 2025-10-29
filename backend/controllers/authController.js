@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
 
         const ok = await admin.verifyPassword(password);
             if(!ok) return res.status(401).json({ message: 'Неправилна лозинка' });
-        const token = signToken(admin, process.env.JWT_SECRET, process.env.JWT_EXPIRES_IN || '7d');
+        const token = signToken({username: admin.username, password:admin.passwordHash, role: "admin"}, process.env.JWT_SECRET, process.env.JWT_EXPIRES_IN || '7d');
       res.json({ token, user: { id: admin._id, username: admin.username, role: "admin"} });
 
 
