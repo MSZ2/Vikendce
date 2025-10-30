@@ -149,7 +149,7 @@ exports.getOwnerReservations = async (req, res) => {
     .lean();
 
   const calendarBookings = await Booking.find({ cottage: { $in: cottageIdList }, status: { $in: ['pending', 'approved'] } })
-    .populate('tourist', 'username firstName lastName')
+    .populate('tourist', 'username firstName lastName email phone')
     .populate('cottage', 'name location')
     .lean();
 

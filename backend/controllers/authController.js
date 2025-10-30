@@ -74,7 +74,7 @@ exports.register = async (req, res) => {
     if (!['owner', 'tourist'].includes(role))
       return res.status(400).json({ message: 'Неважећа улога' });
 
-    console.log(passwordRegex.test(password))
+    //console.log(passwordRegex.test(password))
     if (!passwordRegex.test(password))
       return res.status(400).json({ message: 'Лозинка није у исправном формату' });
 
